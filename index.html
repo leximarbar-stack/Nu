@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E0E10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nueva">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Nueva app</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); background: #0E0E10; }
+body { margin: 0; }
+/* Una sola app oscura de pantalla completa: siete pantallas que se alternan por hash, ondas moradas de fondo */
+:root {
+  --bg: #0E0E10;
+  --surface: #1C1C20;
+  --line: #34343C;
+  --fg: #F2F2F2;
+  --muted: #A8A8B3;
+  --brand: #820AD1;
+  --brand-deep: #2A0A47;
+  --accent: #B26CF0;
+  --card-credit: #5E1B9E;
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+a { color: inherit; text-decoration: none; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+h1:focus { outline: none; }
+
+#app {
+  position: relative;
+  height: 100%;
+  background: var(--bg);
+  overflow: hidden;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: var(--brand-deep);
+}
+body[data-s="bienvenida"]::before { background: var(--bg); }
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+.screen > :not(.waves) { position: relative; z-index: 1; }
+.pad {
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+
+/* Encabezado morado */
+.top {
+  background: var(--brand-deep);
+  color: #FFFFFF;
+  padding-block: 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.top-row { display: flex; align-items: center; justify-content: space-between; }
+.icon-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px;
+  padding: 0; margin: 0;
+  background: transparent; border: none; border-radius: 22px;
+  color: #FFFFFF; cursor: pointer;
+}
+.icon-btn.back { margin-left: -10px; }
+.icon-btn.gear { margin-right: -10px; }
+.top h1 { margin: 0; font-size: 32px; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; }
+
+.content { display: flex; flex-direction: column; gap: 24px; padding-block: 24px 32px; }
+.list { display: flex; flex-direction: column; gap: 12px; }
+
+/* Filas y tarjetas */
+.row {
+  display: flex; align-items: center; gap: 16px;
+  min-height: 72px; padding: 16px 20px;
+  background: var(--surface); border-radius: 16px;
+  font-size: 17px; font-weight: 600;
+}
+.row span { flex: 1; }
+.row svg { flex: none; }
+
+.card {
+  min-height: 214px; padding: 24px; border-radius: 20px;
+  background: var(--brand); color: #FFFFFF;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 20px;
+}
+.card.credit { background: var(--card-credit); }
+.card-head { display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 600; }
+.net-slot {
+  display: flex; align-items: center; justify-content: center;
+  width: 64px; height: 40px; border: 1.5px dashed #FFFFFF; border-radius: 8px;
+  font-size: 11px; font-weight: 600; text-align: center; line-height: 1.2;
+}
+.card-num { font-size: 21px; font-weight: 600; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; }
+.card-name { font-size: 13px; font-weight: 600; letter-spacing: 0.05em; line-height: 1.4; text-transform: uppercase; }
+
+/* Movimientos */
+.moves h2 { margin: 0 0 12px; font-size: 18px; font-weight: 600; }
+.moves ul { margin: 0; padding: 0; list-style: none; background: var(--surface); border-radius: 16px; overflow: hidden; }
+.moves li { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-bottom: 1px solid #2C2C33; }
+.moves li:last-child { border-bottom: none; }
+.badge {
+  flex: none; display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 20px;
+  background: var(--brand-deep); color: var(--accent); font-weight: 700;
+}
+.mv { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.mv b { font-size: 16px; font-weight: 600; }
+.mv small { font-size: 13px; color: var(--muted); }
+.amt { font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* Ahorro */
+.pot { display: flex; flex-direction: column; gap: 8px; padding: 24px 20px; background: var(--surface); border-radius: 16px; }
+.pot small { font-size: 15px; color: var(--muted); }
+.pot strong { font-size: 32px; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.pot .yield { font-size: 13px; font-weight: 600; color: var(--accent); }
+.actions { display: flex; gap: 12px; }
+.action {
+  flex: 1; min-width: 0; min-height: 96px; padding: 16px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  background: var(--surface); border-radius: 16px; font-size: 16px; font-weight: 600;
+}
+
+/* Formularios */
+form { display: flex; flex-direction: column; gap: 20px; }
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field label { font-size: 15px; font-weight: 600; }
+.field input, .field select {
+  width: 100%; height: 52px; padding: 0 16px;
+  background: var(--surface); color: var(--fg);
+  border: 1.5px solid #8A8594; border-radius: 12px;
+  font-family: inherit; font-size: 16px;
+}
+.btn {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 56px; border: none; border-radius: 28px;
+  background: var(--brand); color: #FFFFFF;
+  font-family: inherit; font-size: 17px; font-weight: 600; cursor: pointer;
+}
+
+/* Menú de ajustes */
+.menu-wrap { position: relative; }
+.menu {
+  position: absolute; top: 100%; right: -6px; z-index: 5; width: 264px;
+  padding: 8px; display: flex; flex-direction: column; gap: 2px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+.menu button {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 12px;
+  background: transparent; border: none; border-radius: 12px;
+  color: var(--fg); font-family: inherit; font-size: 16px; font-weight: 500; text-align: left; cursor: pointer;
+}
+.menu button:hover { background: #26262C; }
+
+/* Bienvenida */
+#bienvenida { justify-content: space-between; }
+#bienvenida .hero { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-top: 48px; }
+#bienvenida h1 { margin: 0; font-size: 46px; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; }
+#bienvenida .go { padding-block: 0 48px; }
+
+/* Ondas */
+.waves { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.waves svg { display: block; position: absolute; left: 0; }
+.w-bottom-a { bottom: 0; animation: wave-left 9s linear infinite; }
+.w-bottom-b { bottom: 0; animation: wave-right 14s linear infinite; }
+.r1 { top: 14%; animation: slide-left 10s linear infinite; }
+.r3 { top: 62%; animation: slide-left 16s linear infinite; }
+.bob { position: absolute; left: 0; width: 100%; height: 300px; }
+.bob svg { top: 0; }
+.bob-a { top: 38%; animation: bob 7s ease-in-out infinite alternate; }
+.bob-b { top: 80%; animation: bob 9s ease-in-out infinite alternate-reverse; }
+.bob-a svg { animation: slide-right 13s linear infinite; }
+.bob-b svg { animation: slide-right 11s linear infinite; }
+@keyframes wave-left { from { transform: translateX(0); } to { transform: translateX(-390px); } }
+@keyframes wave-right { from { transform: translateX(-390px); } to { transform: translateX(0); } }
+@keyframes slide-left { from { transform: translateX(0); } to { transform: translateX(-780px); } }
+@keyframes slide-right { from { transform: translateX(-780px); } to { transform: translateX(0); } }
+@keyframes bob { from { transform: translateY(-16px); } to { transform: translateY(16px); } }
+@media (prefers-reduced-motion: reduce) {
+  .waves *, .waves { animation: none !important; }
+}
+</style>
+
+<body>
+<main id="app">
+
+<!-- 1. Bienvenida -->
+<section id="bienvenida" class="screen" aria-label="Bienvenida">
+  <div class="waves" aria-hidden="true">
+    <svg class="w-bottom-b" width="1170" height="320" viewBox="0 0 1170 320"><path d="M0 130 C97.5 80 292.5 180 390 130 C487.5 80 682.5 180 780 130 C877.5 80 1072.5 180 1170 130 V320 H0 Z" fill="#B26CF0" fill-opacity="0.14"/></svg>
+    <svg class="w-bottom-a" width="1170" height="320" viewBox="0 0 1170 320"><path d="M0 100 C97.5 40 292.5 160 390 100 C487.5 40 682.5 160 780 100 C877.5 40 1072.5 160 1170 100 V320 H0 Z" fill="#820AD1" fill-opacity="0.28"/></svg>
+  </div>
+  <div class="hero pad">
+    <h1 tabindex="-1">Bienvenida a la NUeva app</h1>
+  </div>
+  <div class="go pad">
+    <a class="btn" href="#cuentas">Cuentas</a>
+  </div>
+</section>
+
+<!-- 2. Cuentas -->
+<section id="cuentas" class="screen" aria-label="Cuentas" hidden>
+  <div class="waves" data-ribbons aria-hidden="true"></div>
+  <header class="top pad">
+    <div class="top-row">
+      <a class="icon-btn back" href="#bienvenida" aria-label="Volver">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </a>
+      <div class="menu-wrap">
+        <button type="button" id="ajustes-btn" class="icon-btn gear" aria-label="Ajustes" aria-expanded="false" aria-controls="ajustes-menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <div id="ajustes-menu" class="menu" role="menu" hidden>
+          <button type="button" role="menuitem">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B26CF0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Datos de cuenta
+          </button>
+          <button type="button" role="menuitem">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B26CF0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h8M16 6h4M4 12h2M10 12h10M4 18h10M18 18h2"/><circle cx="14" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="18" r="2"/></svg>
+            Ajustes de aplicación
+          </button>
+          <button type="button" role="menuitem">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B26CF0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7"/><path d="M12 17h.01"/></svg>
+            Soporte
+          </button>
+        </div>
+      </div>
+    </div>
+    <h1 tabindex="-1">Cuentas</h1>
+  </header>
+  <div class="content pad">
+    <div class="list">
+      <a class="row" href="#credito">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B26CF0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18"/><path d="M7 15h4"/></svg>
+        <span>Tarjeta de crédito</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A8A8B3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+      <a class="row" href="#debito">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B26CF0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18"/><path d="M7 15h4"/></svg>
+        <span>Tarjeta de débito</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A8A8B3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Tarjeta de crédito -->
+<section id="credito" class="screen" aria-label="Tarjeta de crédito" hidden>
+  <div class="waves" data-ribbons aria-hidden="true"></div>
+  <header class="top pad">
+    <div class="top-row">
+      <a class="icon-btn back" href="#cuentas" aria-label="Volver">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </a>
+    </div>
+    <h1 tabindex="-1">Tarjeta de crédito</h1>
+  </header>
+  <div class="content pad">
+    <div class="card credit">
+      <div class="card-head"><span>Crédito</span><div class="net-slot">Logo de red</div></div>
+      <div class="card-num">9876 5432 1098 7654</div>
+      <div class="card-name">Areli Alejandra Martínez Barrueta</div>
+    </div>
+    <div class="moves">
+      <h2>Movimientos</h2>
+      <ul>
+        <li><span class="badge" aria-hidden="true">N</span><div class="mv"><b>Netflix</b><small>Suscripción · 8 nov</small></div><span class="amt">-$219.00</span></li>
+        <li><span class="badge" aria-hidden="true">P</span><div class="mv"><b>Prime</b><small>Suscripción · 6 nov</small></div><span class="amt">-$99.00</span></li>
+        <li><span class="badge" aria-hidden="true">U</span><div class="mv"><b>Uber</b><small>Suscripción · 3 nov</small></div><span class="amt">-$87.50</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Tarjeta de débito -->
+<section id="debito" class="screen" aria-label="Tarjeta de débito" hidden>
+  <div class="waves" data-ribbons aria-hidden="true"></div>
+  <header class="top pad">
+    <div class="top-row">
+      <a class="icon-btn back" href="#cuentas" aria-label="Volver">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </a>
+    </div>
+    <h1 tabindex="-1">Tarjeta de débito</h1>
+  </header>
+  <div class="content pad">
+    <div class="card">
+      <div class="card-head"><span>Débito</span><div class="net-slot">Logo de red</div></div>
+      <div class="card-num">1234 5678 9012 3456</div>
+      <div class="card-name">Areli Alejandra Martínez Barrueta</div>
+    </div>
+    <div class="list">
+      <a class="row" href="#ahorro">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B26CF0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/><path d="M14.5 9.5c-.5-.8-1.4-1.2-2.5-1.2-1.4 0-2.5.7-2.5 1.8 0 2.4 5 1.2 5 3.6 0 1.1-1.1 1.8-2.5 1.8-1.1 0-2-.4-2.5-1.2"/></svg>
+        <span>Ahorro</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A8A8B3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Ahorro -->
+<section id="ahorro" class="screen" aria-label="Ahorro" hidden>
+  <div class="waves" data-ribbons aria-hidden="true"></div>
+  <header class="top pad">
+    <div class="top-row">
+      <a class="icon-btn back" href="#debito" aria-label="Volver">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </a>
+    </div>
+    <h1 tabindex="-1">Ahorro</h1>
+  </header>
+  <div class="content pad" style="gap:16px">
+    <div class="pot"><small>Apartado 1</small><strong>$26,286.32</strong><span class="yield">12% rendimiento</span></div>
+    <div class="pot"><small>Apartado 2</small><strong>$8,000.00</strong></div>
+    <div class="actions">
+      <a class="action" href="#transferir">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B26CF0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h12M15 3l4 4-4 4M17 17H5M9 13l-4 4 4 4"/></svg>
+        Transferir
+      </a>
+      <a class="action" href="#ingresar">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B26CF0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+        Ingresar
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 6. Transferir -->
+<section id="transferir" class="screen" aria-label="Transferir" hidden>
+  <div class="waves" data-ribbons aria-hidden="true"></div>
+  <header class="top pad">
+    <div class="top-row">
+      <a class="icon-btn back" href="#ahorro" aria-label="Volver">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </a>
+    </div>
+    <h1 tabindex="-1">Transferir</h1>
+  </header>
+  <div class="content pad">
+    <form id="form-transferir">
+      <div class="field"><label for="t-cuenta">Número de cuenta</label><input id="t-cuenta" name="cuenta" type="text" inputmode="numeric" autocomplete="off"></div>
+      <div class="field"><label for="t-nombre">Nombre de quien recibe</label><input id="t-nombre" name="nombre" type="text" autocomplete="off"></div>
+      <div class="field"><label for="t-banco">Tipo de banco</label>
+        <select id="t-banco" name="banco">
+          <option value="">Selecciona un banco</option>
+          <option>BBVA</option><option>Santander</option><option>Banorte</option><option>HSBC</option><option>Banamex</option><option>Otro</option>
+        </select>
+      </div>
+      <button class="btn" type="submit">Continuar</button>
+    </form>
+  </div>
+</section>
+
+<!-- 7. Ingresar -->
+<section id="ingresar" class="screen" aria-label="Ingresar" hidden>
+  <div class="waves" data-ribbons aria-hidden="true"></div>
+  <header class="top pad">
+    <div class="top-row">
+      <a class="icon-btn back" href="#ahorro" aria-label="Volver">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </a>
+    </div>
+    <h1 tabindex="-1">Ingresar</h1>
+  </header>
+  <div class="content pad">
+    <form id="form-ingresar">
+      <div class="field"><label for="i-cuenta">Número de cuenta</label><input id="i-cuenta" name="cuenta" type="text" inputmode="numeric" autocomplete="off"></div>
+      <div class="field"><label for="i-nombre">Nombre de quien envía</label><input id="i-nombre" name="nombre" type="text" autocomplete="off"></div>
+      <div class="field"><label for="i-banco">Tipo de banco</label>
+        <select id="i-banco" name="banco">
+          <option value="">Selecciona un banco</option>
+          <option>BBVA</option><option>Santander</option><option>Banorte</option><option>HSBC</option><option>Banamex</option><option>Otro</option>
+        </select>
+      </div>
+      <button class="btn" type="submit">Continuar</button>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function () {
+  var IDS = ['bienvenida', 'cuentas', 'credito', 'debito', 'ahorro', 'transferir', 'ingresar'];
+  var P = 'M0 60 C195 0 585 120 780 60 C975 0 1365 120 1560 60 L1560 260 C1365 320 975 200 780 260 C585 320 195 200 0 260 Z';
+  function rib(cls, fill, op) {
+    return '<svg class="' + cls + '" width="1170" height="300" viewBox="0 0 1170 300"><path d="' + P + '" fill="' + fill + '" fill-opacity="' + op + '"/></svg>';
+  }
+  var RIBBONS =
+    rib('r1', '#820AD1', '0.07') +
+    '<div class="bob bob-a">' + rib('', '#C084FC', '0.04') + '</div>' +
+    rib('r3', '#6D28D9', '0.08') +
+    '<div class="bob bob-b">' + rib('', '#A855F7', '0.05') + '</div>';
+  Array.prototype.forEach.call(document.querySelectorAll('[data-ribbons]'), function (el) { el.innerHTML = RIBBONS; });
+
+  var btn = document.getElementById('ajustes-btn');
+  var menu = document.getElementById('ajustes-menu');
+  function setMenu(open) {
+    menu.hidden = !open;
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  btn.addEventListener('click', function () { setMenu(menu.hidden); });
+  menu.addEventListener('click', function (e) { if (e.target.closest('button')) setMenu(false); });
+  document.addEventListener('click', function (e) {
+    if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) setMenu(false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !menu.hidden) { setMenu(false); btn.focus(); }
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('form'), function (f) {
+    f.addEventListener('submit', function (e) { e.preventDefault(); });
+  });
+
+  function route(first) {
+    var id = location.hash.slice(1);
+    if (IDS.indexOf(id) < 0) id = 'bienvenida';
+    IDS.forEach(function (s) { document.getElementById(s).hidden = (s !== id); });
+    setMenu(false);
+    document.body.setAttribute('data-s', id);
+    var el = document.getElementById(id);
+    el.scrollTop = 0;
+    if (!first) {
+      var h = el.querySelector('h1');
+      if (h) h.focus({ preventScroll: true });
+    }
+  }
+  window.addEventListener('hashchange', function () { route(false); });
+  route(true);
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
+})();
+</script>
+</body>
+</html>
+
